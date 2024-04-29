@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import sessionmaker
 
 from auth.auth import auth_backend
-from auth.database import User, engine
+from auth.database import User, engine, create_db_and_tables
 from auth.manager import get_user_manager
 from auth.schemas import UserRead, UserCreate
 from models.models import tasks
@@ -13,6 +13,11 @@ from models.models import tasks
 from models.object_models import Task
 
 app = FastAPI()
+
+@app.on_event("startup")
+async def startup_event():
+    await create_db_and_tables()
+    print("Database and tables created successfully")
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
