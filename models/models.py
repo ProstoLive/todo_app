@@ -1,28 +1,39 @@
-from datetime import datetime
+from datetime import date
 
-from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, JSON, Boolean
+from fastapi import HTTPException
+from pydantic import BaseModel, validator
 
-from auth.database import engine
 
-metadata = MetaData()
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
-tasks = Table(
-    "tasks",
-    metadata,
-    Column("id", Integer, primary_key=True),
-    Column("name", String, nullable=False),
-    Column("description", String, nullable=True),
-    Column("author_id", Integer, ForeignKey("users.id"), nullable=False),
-)
 
-users = Table(
-    "users",
-    metadata,
-    Column("id", Integer, primary_key=True),
-    Column("email", String, nullable=False),
-    Column("username", String, nullable=False),
-    Column("hashed_password", String, nullable=False),
-    Column("is_active", Boolean, default=True, nullable=False),
-    Column("is_superuser", Boolean, default=False, nullable=False),
-    Column("is_verified", Boolean, default=False, nullable=False),
-)
+class TokenData(BaseModel):
+    username: str | None = None
+
+
+#Basic pydantic model of user
+
+class User(BaseModel):
+    id: int
+    username: str
+    email: str
+    first_name: str | None = None
+    last_name: str | None = None
+
+
+#Model of how user will be in db. Inherits from User
+class UserInDB(User):
+    hashed_password: str
+
+
+class Date_model(BaseModel):
+    start_date: date
+    end_date: date
+
+    @validator('end_date')
+    def end_date_must_be_after_start_date(cls, v, values, **kwargs):
+        if 'start_date' in values and v <= values['start_date']:
+            raise HTTPException(status_code=400, detail='End date must be after start date')
+        return v
