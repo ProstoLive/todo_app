@@ -20,12 +20,3 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await close_all_connections()
-
-
-'''
-TODO: todo_obj: (title: str, description: str, author_id: int, is_favourite: bool, icon: int, date: TIMESTAMP, isDone: bool)
-TODO: route for making task done (not deleting)
-Можно сделать "сделанным", а можно просто удалить 
-
-есть ручка для выбора всех тасок у текущего юзера, есть возможность удалить таску по её айди, а будет еще возможность заменить ее isDone
-'''
